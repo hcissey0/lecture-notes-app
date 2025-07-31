@@ -23,14 +23,17 @@ interface DataContextType {
   searchTerm: string
   selectedCourse: string
   selectedLecturer: string
+  selectedTag: string
   courses: string[]
   lecturers: string[]
+  tags: string[]
 
   // Data fetching functions
   fetchNotes: () => Promise<void>
   fetchNoteById: (id: string) => Promise<Note | null>
   fetchUserSettings: (userId: string) => Promise<void>
   fetchProfile: (userId: string) => Promise<void>
+  fetchUserNotes: (userId: string) => Promise<Note[]>
 
   // Data manipulation functions
   uploadNote: (noteData: Omit<Note, "id" | "created_at" | "download_count" | "view_count">) => Promise<boolean>
@@ -48,6 +51,7 @@ interface DataContextType {
   setSearchTerm: (term: string) => void
   setSelectedCourse: (course: string) => void
   setSelectedLecturer: (lecturer: string) => void
+  setSelectedTag: (tag: string) => void
   resetFilters: () => void
   getFilteredNotes: () => Note[]
 
@@ -89,16 +93,32 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, user }) =>
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCourse, setSelectedCourse] = useState("all")
   const [selectedLecturer, setSelectedLecturer] = useState("all")
+  const [selectedTag, setSelectedTag] = useState('all');
 
   // Derived data
   const courses = React.useMemo(() => Array.from(new Set(notes.map((note) => note.course))), [notes])
   const lecturers = React.useMemo(() => Array.from(new Set(notes.map((note) => note.lecturer))), [notes])
+  const tags = React.useMemo(() => {
+    const allTags: string[] = [];
+    notes.forEach((note) => allTags.push(...note.tags))
+    return Array.from(new Set(allTags))
+  }, [notes])
+
+  const fetchUserNotes = async (userId: string): Promise<Note[]> => {
+    try {
+      const {data, error} = await db.notes.getByUserId(userId);
+      if (error) throw error
+      return data
+    } catch(e) {
+      throw e
+    }
+  }
 
   // Data fetching functions
   const fetchNotes = useCallback(async () => {
     setNotesLoading(true)
     try {
-      const result = await db.notes.getAll()
+      const result = await db.notes.getRecent()
       if (result.error) {
         toast.error(result.error)
         return
@@ -380,15 +400,17 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, user }) =>
 
       const matchesCourse = selectedCourse === "all" || note.course === selectedCourse
       const matchesLecturer = selectedLecturer === "all" || note.lecturer === selectedLecturer
+      const hasTag = selectedTag === 'all' || note.tags.some((t) => t === selectedTag)
 
-      return matchesSearch && matchesCourse && matchesLecturer
+      return matchesSearch && matchesCourse && matchesLecturer && hasTag
     })
-  }, [notes, searchTerm, selectedCourse, selectedLecturer])
+  }, [notes, searchTerm, selectedCourse, selectedLecturer, selectedTag])
 
   const resetFilters = useCallback(() => {
     setSearchTerm("")
     setSelectedCourse("all")
     setSelectedLecturer("all")
+    setSelectedTag('all')
   }, [])
 
   // Utility functions
@@ -431,14 +453,17 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, user }) =>
     searchTerm,
     selectedCourse,
     selectedLecturer,
+    selectedTag,
     courses,
     lecturers,
+    tags,
 
     // Data fetching functions
     fetchNotes,
     fetchNoteById,
     fetchUserSettings,
     fetchProfile,
+    fetchUserNotes,
 
     // Data manipulation functions
     uploadNote,
@@ -456,6 +481,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children, user }) =>
     setSearchTerm,
     setSelectedCourse,
     setSelectedLecturer,
+    setSelectedTag,
     resetFilters,
     getFilteredNotes,
 

@@ -30,9 +30,8 @@ import Link from "next/link"
 
 
 export default function NoteDetailPage() {
-  const { fetchNoteById, downloadNote, incrementViewCount, generatePreviewUrl, clickedNote } =
+  const { fetchNoteById, updateNote, downloadNote, generatePreviewUrl, clickedNote } =
     useData()
-  const { navigateToHome } = useNavigation()
 
   const [loading, setLoading] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -79,9 +78,26 @@ export default function NoteDetailPage() {
   if (!clickedNote) {
     return (
       <div className="text-center py-12">
+        <div className="flex">
+          <Link href={'/u'}> 
+        <Button variant="ghost">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Notes
+        </Button>
+        </Link>
+          </div>
         <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
         <h3 className="text-lg font-medium text-foreground mb-2">Note not found</h3>
         <p className="text-muted-foreground">The note you're looking for doesn't exist or has been removed.</p>
+      <div className="flex items-center gap-4">
+      </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6 mt-4">
+      {/* Header */}
       <div className="flex items-center gap-4">
         <Link href={'/u'}> 
         <Button variant="ghost">
@@ -90,14 +106,6 @@ export default function NoteDetailPage() {
         </Button>
         </Link>
       </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Note Details */}
@@ -258,14 +266,7 @@ export default function NoteDetailPage() {
           </Card>
         </div>
       </div>
-      <div className="flex items-center gap-4">
-        <Link href={'/u'}> 
-        <Button variant="ghost">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Notes
-        </Button>
-        </Link>
-      </div>
+      
     </div>
   )
 }

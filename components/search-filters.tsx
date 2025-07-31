@@ -2,7 +2,10 @@
 
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useData } from "@/contexts/data-context"
 import { Search, Filter } from "lucide-react"
+import { Badge } from "./ui/badge"
+import { Button } from "./ui/button"
 
 interface SearchFiltersProps {
   searchTerm: string
@@ -11,6 +14,9 @@ interface SearchFiltersProps {
   onCourseChange: (value: string) => void
   selectedLecturer: string
   onLecturerChange: (value: string) => void
+  selectedTag: string
+  setSelectedTag: (value: string) => void
+  tags: string[]
   courses: string[]
   lecturers: string[]
 }
@@ -22,11 +28,14 @@ export function SearchFilters({
   onCourseChange,
   selectedLecturer,
   onLecturerChange,
+  selectedTag,
+  setSelectedTag,
+  tags,
   courses,
   lecturers,
 }: SearchFiltersProps) {
   return (
-    <div className="bg-card rounded-lg border-0 shadow-sm p-6 mb-6">
+    <div className="bg-card rounded-lg border-0 p-6 mb-6">
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="flex-1">
           <div className="relative">
@@ -70,6 +79,14 @@ export function SearchFilters({
             </SelectContent>
           </Select>
         </div>
+      </div>
+      <div className="flex gap-2 mt-2">
+        {tags.map((t) => {
+          return (
+            // <Button size={"sm"} className="rounded-full text-xs">{t}</Button>
+            <Badge variant={selectedTag === t ? "default" : 'outline'} onClick={() => setSelectedTag(t === selectedTag ? 'all' : t)} className="cursor-pointer">{t}</Badge>
+          )
+        })}
       </div>
     </div>
   )

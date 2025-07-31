@@ -20,7 +20,7 @@ export default function ULayout({ children }: { children: React.ReactNode }) {
     <DataProvider user={user}>
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-start">
             <div>
               <h1 className="text-3xl font-bold text-foreground">
                 Lecture Notes Sharing

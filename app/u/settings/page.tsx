@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ArrowLeft, Save, Loader2, User, Shield } from "lucide-react"
 import Link from "next/link"
+import { toast } from "sonner"
 
 interface UserSettings {
   anonymous_uploads: boolean
@@ -49,7 +50,8 @@ export default function SettingsPage() {
         full_name: data.full_name || "",
       })
     } catch (error: any) {
-      setMessage({ type: "error", text: "Failed to load settings" })
+      toast.error("Failed to load settings")
+      // setMessage({ type: "error", text: "Failed to load settings" })
     } finally {
       setLoading(false)
     }
@@ -60,7 +62,7 @@ export default function SettingsPage() {
     if (!user) return
 
     setSaving(true)
-    setMessage(null)
+    // setMessage(null)
 
     try {
       const { error } = await supabase
@@ -72,10 +74,12 @@ export default function SettingsPage() {
         .eq("id", user.id)
 
       if (error) throw error
+      toast.success("Settings saved successfully!")
 
-      setMessage({ type: "success", text: "Settings saved successfully!" })
+      // setMessage({ type: "success", text: "Settings saved successfully!" })
     } catch (error: any) {
-      setMessage({ type: "error", text: "Failed to save settings" })
+      toast.error("Failed to save settings")
+      // setMessage({ type: "error", text: "Failed to save settings" })
     } finally {
       setSaving(false)
     }
@@ -104,6 +108,12 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-">
         <div className="space-y-6">
+        <Link href={"/u"}>
+          <Button variant="ghost">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Notes
+          </Button>
+        </Link>
           <div>
             <h1 className="text-3xl font-bold text-foreground">Settings</h1>
             <p className="text-muted-foreground mt-1">
@@ -200,13 +210,7 @@ export default function SettingsPage() {
           </Card>
 
           {/* Save Button */}
-          <div className="flex justify-between">
-            <Link href={'/u'}>
-            <Button variant="ghost" >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Notes
-            </Button>
-            </Link>
+          <div className="flex justify-end">
             <Button onClick={handleSaveSettings} disabled={saving}>
               {saving ? (
                 <>

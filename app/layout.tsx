@@ -33,7 +33,7 @@ html {
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <ErrorBoundary>
             {children}
-            <Toaster />
+            <Toaster richColors position="top-right" />
           </ErrorBoundary>
         </ThemeProvider>
       </body>

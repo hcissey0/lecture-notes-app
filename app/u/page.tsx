@@ -3,17 +3,12 @@ import { useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { useAuth } from "@/hooks/use-auth"
 import { DataProvider, useData } from "@/contexts/data-context"
-import AuthForm from "@/components/auth-form"
-import { HomePage } from "@/components/pages/home-page"
-import { NoteDetailPage } from "@/components/pages/note-detail-page"
-import { SettingsPage } from "@/components/pages/settings-page"
-import { UserAvatar } from "@/components/user-avatar"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { FileText, Loader2 } from "lucide-react"
 import { NoteCard } from "@/components/note-card"
 import { SearchFilters } from "@/components/search-filters"
 import { UploadDialog } from "@/components/upload-dialog"
 import { useNavigation } from "@/hooks/use-navigation"
+import { User } from "@supabase/supabase-js"
 
 
 
@@ -24,11 +19,14 @@ export default function Dashboard() {
         searchTerm,
         selectedCourse,
         selectedLecturer,
+        selectedTag,
         courses,
         lecturers,
+        tags,
         setSearchTerm,
         setSelectedCourse,
         setSelectedLecturer,
+        setSelectedTag,
         getFilteredNotes,
         downloadNote,
         userSettings,
@@ -40,15 +38,13 @@ export default function Dashboard() {
     
       const filteredNotes = getFilteredNotes()
     
-      const handleViewNote = (noteId: string) => {
-        navigateToNote(noteId)
-      }
+
     
       return (
         <div className="space-y-6">
           {/* Header */}
           <div className="flex justify-end items-center gap-4">
-            <UploadDialog user={user} isAnonymous={userSettings?.anonymous_uploads || false} />
+            <UploadDialog user={user as User} isAnonymous={userSettings?.anonymous_uploads || false} />
           </div>
     
           {/* Search and Filters */}
@@ -59,6 +55,9 @@ export default function Dashboard() {
             onCourseChange={setSelectedCourse}
             selectedLecturer={selectedLecturer}
             onLecturerChange={setSelectedLecturer}
+            selectedTag={selectedTag}
+            setSelectedTag={setSelectedTag}
+            tags={tags}
             courses={courses}
             lecturers={lecturers}
           />
@@ -73,7 +72,7 @@ export default function Dashboard() {
               {/* Notes Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredNotes.map((note) => (
-                  <NoteCard key={note.id} note={note} onDownload={downloadNote} onView={() => setClickedNote(note)}  />
+                  <NoteCard key={note.id} note={note} />
                 ))}
               </div>
     

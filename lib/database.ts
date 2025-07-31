@@ -50,38 +50,45 @@ export const notesDb = {
   // Fetch all notes
   async getAll(): Promise<DatabaseListResult<Note>> {
     try {
-      const { data, error } = await supabase.from("notes").select("*").order("created_at", { ascending: false })
+      const { data, error } = await supabase
+        .from("notes")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-      if (error) throw error
+      if (error) throw error;
 
       return {
         data: data || [],
         error: null,
-      }
+      };
     } catch (error: any) {
       return {
         data: [],
         error: error.message || "Failed to fetch notes",
-      }
+      };
     }
   },
 
   // Fetch note by ID
   async getById(id: string): Promise<DatabaseResult<Note>> {
     try {
-      const { data, error } = await supabase.from("notes").select("*").eq("id", id).single()
+      const { data, error } = await supabase
+        .from("notes")
+        .select("*")
+        .eq("id", id)
+        .single();
 
-      if (error) throw error
+      if (error) throw error;
 
       return {
         data,
         error: null,
-      }
+      };
     } catch (error: any) {
       return {
         data: null,
         error: error.message || "Failed to fetch note",
-      }
+      };
     }
   },
 
@@ -92,19 +99,19 @@ export const notesDb = {
         .from("notes")
         .select("*")
         .eq("uploader_id", userId)
-        .order("created_at", { ascending: false })
+        .order("created_at", { ascending: false });
 
-      if (error) throw error
+      if (error) throw error;
 
       return {
         data: data || [],
         error: null,
-      }
+      };
     } catch (error: any) {
       return {
         data: [],
         error: error.message || "Failed to fetch user notes",
-      }
+      };
     }
   },
 
@@ -114,26 +121,28 @@ export const notesDb = {
       const { data, error } = await supabase
         .from("notes")
         .select("*")
-        .or(`title.ilike.%${query}%,course.ilike.%${query}%,lecturer.ilike.%${query}%,description.ilike.%${query}%`)
-        .order("created_at", { ascending: false })
+        .or(
+          `title.ilike.%${query}%,course.ilike.%${query}%,lecturer.ilike.%${query}%,description.ilike.%${query}%`
+        )
+        .order("created_at", { ascending: false });
 
-      if (error) throw error
+      if (error) throw error;
 
       return {
         data: data || [],
         error: null,
-      }
+      };
     } catch (error: any) {
       return {
         data: [],
         error: error.message || "Failed to search notes",
-      }
+      };
     }
   },
 
   // Create new note
   async create(
-    noteData: Omit<Note, "id" | "created_at" | "download_count" | "view_count">,
+    noteData: Omit<Note, "id" | "created_at" | "download_count" | "view_count">
   ): Promise<DatabaseResult<Note>> {
     try {
       const { data, error } = await supabase
@@ -144,57 +153,65 @@ export const notesDb = {
           view_count: 0,
         })
         .select()
-        .single()
+        .single();
 
-      if (error) throw error
+      if (error) throw error;
 
       return {
         data,
         error: null,
-      }
+      };
     } catch (error: any) {
       return {
         data: null,
         error: error.message || "Failed to create note",
-      }
+      };
     }
   },
 
   // Update note
-  async update(id: string, updates: Partial<Note>): Promise<DatabaseResult<Note>> {
+  async update(
+    id: string,
+    updates: Partial<Note>
+  ): Promise<DatabaseResult<Note>> {
     try {
-      const { data, error } = await supabase.from("notes").update(updates).eq("id", id).select().single()
+      const { data, error } = await supabase
+        .from("notes")
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
 
-      if (error) throw error
+      if (error) throw error;
 
       return {
         data,
         error: null,
-      }
+      };
     } catch (error: any) {
       return {
         data: null,
         error: error.message || "Failed to update note",
-      }
+      };
     }
   },
 
   // Delete note
   async delete(id: string): Promise<DatabaseResult<boolean>> {
     try {
-      const { error } = await supabase.from("notes").delete().eq("id", id)
+      const { error } = await supabase.from("notes").delete().eq("id", id);
 
-      if (error) throw error
+      if (error) throw error;
 
       return {
         data: true,
         error: null,
-      }
+      };
     } catch (error: any) {
       return {
         data: null,
         error: error.message || "Failed to delete note",
-      }
+      };
     }
   },
 
@@ -203,27 +220,27 @@ export const notesDb = {
     try {
       const { data, error } = await supabase.rpc("increment_view_count", {
         note_id: id,
-      })
+      });
 
-      if (error) throw error
+      if (error) throw error;
 
       // Fetch updated note
-      const updatedNote = await this.getById(id)
-      return updatedNote
+      const updatedNote = await this.getById(id);
+      return updatedNote;
     } catch (error: any) {
       // Fallback to manual increment if RPC fails
       try {
-        const noteResult = await this.getById(id)
+        const noteResult = await this.getById(id);
         if (noteResult.data) {
-          const newViewCount = (noteResult.data.view_count || 0) + 1
-          return await this.update(id, { view_count: newViewCount })
+          const newViewCount = (noteResult.data.view_count || 0) + 1;
+          return await this.update(id, { view_count: newViewCount });
         }
-        throw new Error("Note not found")
+        throw new Error("Note not found");
       } catch (fallbackError: any) {
         return {
           data: null,
           error: fallbackError.message || "Failed to increment view count",
-        }
+        };
       }
     }
   },
@@ -233,27 +250,27 @@ export const notesDb = {
     try {
       const { data, error } = await supabase.rpc("increment_download_count", {
         note_id: id,
-      })
+      });
 
-      if (error) throw error
+      if (error) throw error;
 
       // Fetch updated note
-      const updatedNote = await this.getById(id)
-      return updatedNote
+      const updatedNote = await this.getById(id);
+      return updatedNote;
     } catch (error: any) {
       // Fallback to manual increment if RPC fails
       try {
-        const noteResult = await this.getById(id)
+        const noteResult = await this.getById(id);
         if (noteResult.data) {
-          const newDownloadCount = (noteResult.data.download_count || 0) + 1
-          return await this.update(id, { download_count: newDownloadCount })
+          const newDownloadCount = (noteResult.data.download_count || 0) + 1;
+          return await this.update(id, { download_count: newDownloadCount });
         }
-        throw new Error("Note not found")
+        throw new Error("Note not found");
       } catch (fallbackError: any) {
         return {
           data: null,
           error: fallbackError.message || "Failed to increment download count",
-        }
+        };
       }
     }
   },
@@ -266,19 +283,19 @@ export const notesDb = {
         .select("*")
         .order("view_count", { ascending: false })
         .order("download_count", { ascending: false })
-        .limit(limit)
+        .limit(limit);
 
-      if (error) throw error
+      if (error) throw error;
 
       return {
         data: data || [],
         error: null,
-      }
+      };
     } catch (error: any) {
       return {
         data: [],
         error: error.message || "Failed to fetch popular notes",
-      }
+      };
     }
   },
 
@@ -289,19 +306,19 @@ export const notesDb = {
         .from("notes")
         .select("*")
         .order("created_at", { ascending: false })
-        .limit(limit)
+        .limit(limit);
 
-      if (error) throw error
+      if (error) throw error;
 
       return {
         data: data || [],
         error: null,
-      }
+      };
     } catch (error: any) {
       return {
         data: [],
         error: error.message || "Failed to fetch recent notes",
-      }
+      };
     }
   },
 
@@ -312,19 +329,19 @@ export const notesDb = {
         .from("notes")
         .select("*")
         .eq("course", course)
-        .order("created_at", { ascending: false })
+        .order("created_at", { ascending: false });
 
-      if (error) throw error
+      if (error) throw error;
 
       return {
         data: data || [],
         error: null,
-      }
+      };
     } catch (error: any) {
       return {
         data: [],
         error: error.message || "Failed to fetch notes by course",
-      }
+      };
     }
   },
 
@@ -335,64 +352,107 @@ export const notesDb = {
         .from("notes")
         .select("*")
         .eq("lecturer", lecturer)
-        .order("created_at", { ascending: false })
+        .order("created_at", { ascending: false });
 
-      if (error) throw error
+      if (error) throw error;
 
       return {
         data: data || [],
         error: null,
-      }
+      };
     } catch (error: any) {
       return {
         data: [],
         error: error.message || "Failed to fetch notes by lecturer",
-      }
+      };
     }
   },
 
   // Get unique courses
   async getCourses(): Promise<DatabaseListResult<string>> {
     try {
-      const { data, error } = await supabase.from("notes").select("course").order("course")
+      const { data, error } = await supabase
+        .from("notes")
+        .select("course")
+        .order("course");
 
-      if (error) throw error
+      if (error) throw error;
 
-      const uniqueCourses = Array.from(new Set(data?.map((item) => item.course) || []))
+      const uniqueCourses = Array.from(
+        new Set(data?.map((item) => item.course) || [])
+      );
 
       return {
         data: uniqueCourses,
         error: null,
-      }
+      };
     } catch (error: any) {
       return {
         data: [],
         error: error.message || "Failed to fetch courses",
-      }
+      };
     }
   },
 
   // Get unique lecturers
   async getLecturers(): Promise<DatabaseListResult<string>> {
     try {
-      const { data, error } = await supabase.from("notes").select("lecturer").order("lecturer")
+      const { data, error } = await supabase
+        .from("notes")
+        .select("lecturer")
+        .order("lecturer");
 
-      if (error) throw error
+      if (error) throw error;
 
-      const uniqueLecturers = Array.from(new Set(data?.map((item) => item.lecturer) || []))
+      const uniqueLecturers = Array.from(
+        new Set(data?.map((item) => item.lecturer) || [])
+      );
 
       return {
         data: uniqueLecturers,
         error: null,
-      }
+      };
     } catch (error: any) {
       return {
         data: [],
         error: error.message || "Failed to fetch lecturers",
-      }
+      };
     }
   },
-}
+
+  // Get unique tags
+  async getTags(): Promise<DatabaseListResult<string>> {
+    try {
+      // Select only the 'tags' column
+      const { data, error } = await supabase.from("notes").select("tags");
+
+      if (error) throw error;
+
+      // Flatten the array of tag arrays and get unique tags
+      const allTags: string[] = [];
+      data?.forEach((item) => {
+        if (item.tags) {
+          allTags.push(...item.tags); // Spread the array of tags into the allTags array
+        }
+      });
+
+      const uniqueTags = Array.from(new Set(allTags));
+
+      // Sort the tags alphabetically
+      uniqueTags.sort();
+
+      return {
+        data: uniqueTags,
+        error: null,
+      };
+    } catch (error: any) {
+      return {
+        data: [],
+        error: error.message || "Failed to fetch tags",
+      };
+    }
+  },
+};
 
 // Profiles operations
 export const profilesDb = {

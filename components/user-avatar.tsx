@@ -63,10 +63,12 @@ export function UserAvatar({ user, onSignOut }: UserAvatarProps) {
           <span>Home</span>
         </DropdownMenuItem>
         </Link>
+        <Link href={'/u/profile'}>
         <DropdownMenuItem className="cursor-pointer">
           <UserIcon className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
+        </Link>
         <Link href={'/u/settings'}>
         <DropdownMenuItem className="cursor-pointer">
           <Settings className="mr-2 h-4 w-4" />
